@@ -20,8 +20,7 @@ jobs:
       - name: Get all repositories
         run: |
           echo "Fetching all repositories..."
-          response=$(curl -w "%{http_code}" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -s "https://api.github.com/user/repos?type=all")
-
+          response=$(curl -w "%{http_code}" -H "Authorization: token ${{ secrets.TOKEN }}" -s "https://api.github.com/user/repos?type=all")
           http_code=$(echo $response | tail -n1)
           echo "HTTP status code: $http_code"
 
