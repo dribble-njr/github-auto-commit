@@ -35,7 +35,7 @@ jobs:
       - name: Read repositories list and check commits
         run: |
           date_today=$(TZ='Asia/Shanghai' date -I) # Date part
-          time_start="${date_today}T00:00:00"
+          time_start="${date_today}T20:00:00"
           time_end="${date_today}T23:55:00"
           commits_exist=false
           echo "Checking commits between $time_start and $time_end"
@@ -54,9 +54,11 @@ jobs:
 
           if [[ "$commits_exist" == "false" ]]; then
             echo "No commits found today across all repositories. Creating a dummy commit..."
-            echo "$(date) No commits found today" >> dummy.txt
+            git clone https://github.com/dribble-njr/github-auto-commit.git
+            cd github-auto-commit
+            echo "$date_today No commits found today" >> dummy.txt
             git add dummy.txt
-            git commit -m "Auto commit on $(date)"
+            git commit -m "Auto commit on $(TZ='Asia/Shanghai' date +%Y:%m:%d:%H:%M)"
             git push
           else
             echo "Commits found today."
