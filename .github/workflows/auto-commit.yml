@@ -20,15 +20,14 @@ jobs:
       - name: Get all repositories
         run: |
           echo "Fetching all repositories..."
-          response=$(curl -w "%{http_code}" -H "Authorization: token ${{ secrets.TOKEN }}" -s "https://api.github.com/user/repos?type=all")
-          http_code=$(echo $response | tail -n1)
+          response=$(curl -s -w "\n%{http_code}" -H "Authorization: token ${{ secrets.TOKEN }}" "https://api.github.com/user/repos?type=all")
+          http_code=$(echo "$response" | tail -n1)
+          response_body=$(echo "$response" | sed '$d')
+
           echo "HTTP status code: $http_code"
 
-          contained_repos=$(echo $response | jq -r '.[] | .full_name')
+          contained_repos=$(echo "$response_body" | jq -r '.[] | .full_name')
           echo "Contained repositories: $contained_repos"
-
-          echo "Fetched the following repositories:"
-          cat repositories.txt
 
       - name: Read repositories list and check commits
         run: |
@@ -40,7 +39,7 @@ jobs:
 
           while IFS= read -r repo; do
             echo "Checking commits for $repo"
-            commit_today=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -s "https://api.github.com/repos/$repo/commits?since=$time_start&until=$time_end")        
+            commit_today=$(curl -H "Authorization: token ${{ secrets.TOKEN }}" -s "https://api.github.com/repos/$repo/commits?since=$time_start&until=$time_end")        
             if [[ -n "$commit_today" ]]; then
               echo "Commits today in $repo:"
               echo "$commit_today"
