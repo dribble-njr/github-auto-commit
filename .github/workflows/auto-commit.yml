@@ -20,7 +20,14 @@ jobs:
       - name: Get all repositories
         run: |
           echo "Fetching all repositories..."
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -s "https://api.github.com/user/repos" | jq -r '.[] | select(type=="object") | .full_name' > repositories.txt
+          response=$(curl -w "%{http_code}" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -s "https://api.github.com/user/repos?type=all")
+
+          http_code=$(echo $response | tail -n1)
+          echo "HTTP status code: $http_code"
+
+          contained_repos=$(echo $response | jq -r '.[] | .full_name')
+          echo "Contained repositories: $contained_repos"
+
           echo "Fetched the following repositories:"
           cat repositories.txt
 
