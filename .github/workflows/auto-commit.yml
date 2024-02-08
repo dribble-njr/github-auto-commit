@@ -54,6 +54,8 @@ jobs:
 
           if [[ "$commits_exist" == "false" ]]; then
             echo "No commits found today across all repositories. Creating a dummy commit..."
+            git clone https://github.com/dribble-njr/github-auto-commit.git
+            cd github-auto-commit
             echo "$date_today No commits found today" >> dummy.txt
             git add dummy.txt
             git commit -m "Auto commit on $(TZ='Asia/Shanghai' date +%Y:%m:%d:%H:%M)"
