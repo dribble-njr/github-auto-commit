@@ -18,6 +18,7 @@ jobs:
           git config --global user.name "dribble-njr"
 
       - name: Get all repositories
+        id: get-repos
         run: |
           echo "Fetching all repositories..."
           response=$(curl -s -w "\n%{http_code}" -H "Authorization: token ${{ secrets.TOKEN }}" "https://api.github.com/user/repos?type=all")
@@ -29,6 +30,8 @@ jobs:
           contained_repos=$(echo "$response_body" | jq -r '.[] | .full_name')
           echo "Contained repositories: $contained_repos"
 
+          echo "::set-output name=repos::$(echo "$contained_repos" | tr '\n' ',')" # output repos
+
       - name: Read repositories list and check commits
         run: |
           date_today=$(TZ='Asia/Shanghai' date -I) # Date part
@@ -37,24 +40,24 @@ jobs:
           commits_exist=false
           echo "Checking commits between $time_start and $time_end"
 
-          while IFS= read -r repo; do
+          IFS=', ' read -r -a repos <<< "${{ steps.get-repos.outputs.repos }}"
+          for repo in "${repos[@]}"; do
             echo "Checking commits for $repo"
-            commit_today=$(curl -H "Authorization: token ${{ secrets.TOKEN }}" -s "https://api.github.com/repos/$repo/commits?since=$time_start&until=$time_end")        
+            commit_today=$(curl -H "Authorization: token ${{ secrets.TOKEN }}" -s "https://api.github.com/repos/$repo/commits?since=$time_start&until=$time_end")
             if [[ -n "$commit_today" ]]; then
-              echo "Commits today in $repo:"
-              echo "$commit_today"
-              commits_exist=true
-              break
+                echo "Commits today in $repo:"
+                echo "$commit_today"
+                commits_exist=true
+                break
             fi
+          done
 
-            if [[ "$commits_exist" == "false" ]]; then
-              echo "No commits found today across all repositories. Creating a dummy commit..."
-              echo "$(date) No commits found today" >> dummy.txt
-              git add dummy.txt
-              git commit -m "Auto commit on $(date)"
-              git push
-            else
-              echo "Commits found today."
-            fi
-
-          done < repositories.txt
+          if [[ "$commits_exist" == "false" ]]; then
+            echo "No commits found today across all repositories. Creating a dummy commit..."
+            echo "$(date) No commits found today" >> dummy.txt
+            git add dummy.txt
+            git commit -m "Auto commit on $(date)"
+            git push
+          else
+            echo "Commits found today."
+          fi
