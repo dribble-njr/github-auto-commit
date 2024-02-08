@@ -25,7 +25,7 @@ jobs:
           http_code=$(echo "$response" | tail -n1)
           response_body=$(echo "$response" | sed '$d')
 
-          echo "HTTP status code: $http_code"
+          echo "[HTTP status code]: $http_code"
 
           contained_repos=$(echo "$response_body" | jq -r '.[] | .full_name')
           echo "Contained repositories: $contained_repos"
@@ -59,7 +59,7 @@ jobs:
             echo "$date_today No commits found today" >> dummy.txt
             git add dummy.txt
             git commit -m "Auto commit on $(TZ='Asia/Shanghai' date +%Y:%m:%d:%H:%M)"
-            git push
+            git push https://${{ secrets.TOKEN }}@github.com/${{ github.repository }}.git
           else
             echo "Commits found today."
           fi
