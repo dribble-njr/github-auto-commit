@@ -1,4 +1,4 @@
-name: Check Repositories Commits
+name: Auto Commit
 
 on:
   schedule:
@@ -17,17 +17,39 @@ jobs:
           git config --global user.email "wzw15292257101@163.com"
           git config --global user.name "dribble-njr"
 
-      - name: List all repositories
+      - name: Get all repositories
         run: |
+          echo "Fetching all repositories..."
           curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -s "https://api.github.com/user/repos" | jq -r '.[] | select(type=="object") | .full_name' > repositories.txt
+          echo "Fetched the following repositories:"
+          cat repositories.txt
 
       - name: Read repositories list and check commits
         run: |
+          date_today=$(TZ='Asia/Shanghai' date -I) # Date part
+          time_start="${date_today}T00:00:00"
+          time_end="${date_today}T23:55:00"
+          commits_exist=false
+          echo "Checking commits between $time_start and $time_end"
+
           while IFS= read -r repo; do
             echo "Checking commits for $repo"
-            git clone --depth 1 "https://github.com/$repo" temp-repo
-            cd temp-repo
-            git log --oneline
-            cd ..
-            rm -rf temp-repo
+            commit_today=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -s "https://api.github.com/repos/$repo/commits?since=$time_start&until=$time_end")        
+            if [[ -n "$commit_today" ]]; then
+              echo "Commits today in $repo:"
+              echo "$commit_today"
+              commits_exist=true
+              break
+            fi
+
+            if [[ "$commits_exist" == "false" ]]; then
+              echo "No commits found today across all repositories. Creating a dummy commit..."
+              echo "$(date) No commits found today" >> dummy.txt
+              git add dummy.txt
+              git commit -m "Auto commit on $(date)"
+              git push
+            else
+              echo "Commits found today."
+            fi
+
           done < repositories.txt
