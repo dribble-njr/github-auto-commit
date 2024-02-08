@@ -44,7 +44,7 @@ jobs:
           for repo in "${repos[@]}"; do
             echo "Checking commits for $repo"
             commit_today=$(curl -H "Authorization: token ${{ secrets.TOKEN }}" -s "https://api.github.com/repos/$repo/commits?since=$time_start&until=$time_end")
-            if [[ -n "$commit_today" ]]; then
+            if echo "$commit_today" | jq -e '.[]' > /dev/null; then
                 echo "Commits today in $repo:"
                 echo "$commit_today"
                 commits_exist=true
