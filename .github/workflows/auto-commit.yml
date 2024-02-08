@@ -19,7 +19,7 @@ jobs:
 
       - name: List all repositories
         run: |
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -s "https://api.github.com/user/repos" | jq -r '.[].full_name' > repositories.txt
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -s "https://api.github.com/user/repos" | jq -r '. | .[].full_name' > repositories.txt
 
       - name: Read repositories list and check commits
         run: |
