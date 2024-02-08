@@ -1,0 +1,33 @@
+name: Check Repositories Commits
+
+on:
+  schedule:
+    - cron: "50 23 * * *" # run on 23:50 UTC
+  workflow_dispatch:
+
+jobs:
+  check_commits:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "wzw15292257101@163.com"
+          git config --global user.name "dribble-njr"
+
+      - name: List all repositories
+        run: |
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -s "https://api.github.com/user/repos" | jq -r '.[].full_name' > repositories.txt
+
+      - name: Read repositories list and check commits
+        run: |
+          while IFS= read -r repo; do
+            echo "Checking commits for $repo"
+            git clone --depth 1 "https://github.com/$repo" temp-repo
+            cd temp-repo
+            git log --oneline
+            cd ..
+            rm -rf temp-repo
+          done < repositories.txt
