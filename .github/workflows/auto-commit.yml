@@ -41,7 +41,7 @@ jobs:
           date_today=$(TZ='Asia/Shanghai' date -I) # Date part
           time_start="${date_today}T00:00:00"
           time_end="${date_today}T23:55:00"
-          repo="https://github.com/dribble-njr/github-auto-commit.git"
+          commit_repo="https://github.com/dribble-njr/github-auto-commit.git"
           commit_message="Auto commit on $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')"
 
           commits_exist=false
@@ -61,7 +61,7 @@ jobs:
 
           if [[ "$commits_exist" == "false" ]]; then
             echo "No commits found today across all repositories. Creating a dummy commit..."
-            git clone $repo
+            git clone $commit_repo
             cd github-auto-commit
             echo "$date_today No commits found today, auto commited." >> dummy.txt
             git add dummy.txt
