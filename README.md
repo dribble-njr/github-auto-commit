@@ -14,7 +14,7 @@ If not, it will auto commit in `dummy.txt` file and push to the repository.
 
 ## Usage
 
-[![Clone this repo](https://img.shields.io/badge/Clone-This%20Repo-brightgreen.svg)](https://github.com/dribble-njr/github-auto-commit.git)
+[![Clone this repo](https://img.shields.io/badge/Clone-This%20Repo-brightgreen.svg)](https://github.com/new?template_name=github-auto-commit&template_owner=dribble-njr&owner=%40me&name=github-auto-commit&description=Make+your+GitHub+green!&visibility=public)
 
 > **Note**: Don't fork this repository, because the GitHub Actions will not work in the forked repository.
 
