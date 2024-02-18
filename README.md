@@ -14,9 +14,12 @@ If not, it will auto commit in `dummy.txt` file and push to the repository.
 
 ## Usage
 
-1. Fork this repo.
-2. Generate a new personal access token (`PAT`) with the `repo` scope.
-3. In the repository settings.
+[![Clone this repo](https://img.shields.io/badge/Clone-This%20Repo-brightgreen.svg)](https://github.com/dribble-njr/github-auto-commit.git)
+
+> **Note**: Don't fork this repository, because the GitHub Actions will not work in the forked repository.
+
+1. Generate a new personal access token (`PAT`) with the `repo` scope.
+2. In the repository settings.
    1. Find the `Security` tab in the left.
    2. Go to Secrets and variables.
    3. Click Actions.
@@ -30,4 +33,4 @@ You can change the configuration by yourself.
 
 1. Change the scheduling time on `Schedule`, the default is `50 15 * * *` (UTC, every day at 23:50 in China time).
 2. Change the `email` and `name` information on `Set up Git` step in .github/workflows/auto-commit.yml.
-3. Change `date_today`, `time_start`, `time_end`, `repo` and `commit_message` on the last step.
+3. Change `date_today`, `time_start`, `time_end`, and `commit_message` on the last step.
